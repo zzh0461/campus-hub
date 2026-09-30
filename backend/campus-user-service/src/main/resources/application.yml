@@ -1,0 +1,52 @@
+# ============================================================
+# CampusHub 用户服务 campus-user-service
+# 本文件只放"启动引导"配置：服务名、端口、如何连 Nacos
+# 数据库 / Redis / MyBatis-Plus 等业务配置放在 Nacos 上的 campus-user-service.yaml
+# ============================================================
+
+server:
+  # 用户服务端口（网关 8080、认证 8081，这里用 8083，不冲突即可）
+  port: 8083
+
+spring:
+  application:
+    # 服务名，必须和网关路由里的 lb://campus-user-service 一致
+    name: campus-user-service
+
+  # 【问题1的修复】从 Nacos 配置中心导入业务配置
+  config:
+    # optional 表示：即使 Nacos 上暂时没这份配置也允许启动，方便本地调试
+    # refreshEnabled=true 表示：Nacos 上改了配置能动态刷新
+    import: optional:nacos:campus-user-service.yaml?group=DEFAULT_GROUP&refreshEnabled=true
+
+  cloud:
+    nacos:
+      # 配置中心连接信息（这些必须留在本地，不能依赖 Nacos 自己提供）
+      config:
+        server-addr: ${NACOS_ADDR:127.0.0.1:8848}
+        # 【问题2的修复】Nacos 登录账号密码
+        username: ${NACOS_USERNAME:nacos}
+        password: ${NACOS_PASSWORD:nacos}
+        file-extension: yaml
+      # 服务发现连接信息
+      server-addr: ${NACOS_ADDR:127.0.0.1:8848}
+      username: ${NACOS_USERNAME:nacos}
+      password: ${NACOS_PASSWORD:nacos}
+      discovery:
+        server-addr: ${NACOS_ADDR:127.0.0.1:8848}
+        # 注册到 Nacos 的 IP：本地开发可留空由框架自动探测；
+        # 多网卡环境建议显式指定可回连地址，换网络时用环境变量 NACOS_REGISTER_IP 覆盖
+        ip: ${NACOS_REGISTER_IP:0.0.0.0}
+        group: DEFAULT_GROUP
+
+        # 开启 Feign 断路器：只有打开这个开关，@FeignClient 的 fallback 降级才会生效
+    openfeign:
+      circuitbreaker:
+        enabled: true
+
+# Resilience4j 超时配置：断路器默认超时仅 1 秒，太短容易误判失败触发降级，放宽到 5 秒
+resilience4j:
+  timelimiter:
+    configs:
+      default:
+        timeout-duration: 5s

@@ -1,0 +1,52 @@
+# Nacos Data ID: campus-admin-service.yaml
+# Group: DEFAULT_GROUP
+
+# ============================================================
+# CampusHub 管理服务 campus-admin-service
+#
+# 定位：聚合门面(BFF)。自己不连任何数据库、Redis、MQ，
+#       所有数据都通过 OpenFeign 调各下游服务的 internal 管理接口。
+#
+# 因此本文件【故意不包含】datasource / data.redis / rabbitmq：
+#   1. 服务未引入 mybatis-plus、redis、amqp 依赖，配了也不生效；
+#   2. 配了反而会误导后来人以为 admin 有独立存储。
+#
+# 这里只放 BFF 层自身的调优项：Feign 超时 + 日志级别。
+# ============================================================
+
+spring:
+  cloud:
+    # OpenFeign 配置
+    openfeign:
+      client:
+        config:
+          # default = 对所有 @FeignClient 生效（admin 的 5 个下游客户端统一走这里）
+          default:
+            # 建立 TCP 连接的超时（毫秒）
+            connect-timeout: 3000
+            # 读取响应的超时（毫秒）
+            #
+            # ⚠️ 注意：admin 同时开启了 Resilience4j 断路器
+            #   （spring.cloud.openfeign.circuitbreaker.enabled=true，写在本地 application.yml），
+            #   断路器会把每次 Feign 调用包一层 TimeLimiter，其 timeout-duration 默认走
+            #   resilience4j.timelimiter.configs.default.timeout-duration（本地配的是 5s）。
+            #
+            #   两者取【先到者】生效 → 实际生效的是 5s，这里的 read-timeout 只在
+            #   断路器被旁路时才起作用。所以想让 admin 的下游调用真正拿到 10s 预算，
+            #   必须同步把下面的 resilience4j.timeout-duration 也调大（现已设为 10s，与之一致）。
+            read-timeout: 10000
+
+# Resilience4j 超时：admin 聚合多个下游服务，串行调用累积耗时较长，
+# 默认 1s / 本地其他服务用的 5s 都偏紧，这里放宽到 10s，
+# 与上面 openfeign 的 read-timeout 对齐，避免"以为给了 10s 实际 5s 就被掐断"。
+resilience4j:
+  timelimiter:
+    configs:
+      default:
+        timeout-duration: 10s
+
+# Spring Boot 日志配置
+logging:
+  level:
+    # 管理服务自身代码使用 DEBUG，便于排查 Feign 调用链路
+    com.campushub: debug

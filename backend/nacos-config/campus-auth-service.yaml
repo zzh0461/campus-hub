@@ -1,0 +1,82 @@
+# Nacos Data ID: campus-auth-service.yaml
+# Group: DEFAULT_GROUP
+
+spring:
+  # Spring Boot 数据源配置
+  datasource:
+    # MySQL JDBC 连接地址；MYSQL_HOST 未设置时使用 0.0.0.0
+    url: jdbc:mysql://${MYSQL_HOST:0.0.0.0}:3306/campus_user?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    # MySQL 登录用户名；未设置 MYSQL_USERNAME 时使用 root
+    username: ${MYSQL_USERNAME:root}
+    # MySQL 登录密码；未设置 MYSQL_PASSWORD 时使用 123456
+    password: ${MYSQL_PASSWORD:123456}
+    # MySQL JDBC 驱动类
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # HikariCP 数据库连接池配置
+    hikari:
+      # 连接池保持的最小空闲连接数
+      minimum-idle: 5
+      # 连接池允许创建的最大连接数
+      maximum-pool-size: 20
+      # 空闲连接超过 300000 毫秒（5 分钟）后回收
+      idle-timeout: 300000
+      # 单个连接最大存活时间 1800000 毫秒（30 分钟）
+      max-lifetime: 1800000
+      # 获取数据库连接最多等待 30000 毫秒（30 秒）
+      connection-timeout: 30000
+  # Spring Data 配置
+  data:
+    # Redis 配置
+    redis:
+      # Redis 服务器地址；未设置 REDIS_HOST 时使用 0.0.0.0
+      host: ${REDIS_HOST:0.0.0.0}
+      # Redis 服务端口
+      port: ${REDIS_PORT:6379}
+      # Redis 登录密码；未设置 REDIS_PASSWORD 时使用 123456
+      password: ${REDIS_PASSWORD:123456}
+      # Redis 使用的逻辑数据库编号
+      database: 0
+      # Redis 命令超时时间，单位为毫秒
+      timeout: 10000
+      # Lettuce Redis 客户端连接池配置
+      lettuce:
+        pool:
+          # Redis 连接池最大活动连接数
+          max-active: 20
+          # Redis 连接池最大空闲连接数
+          max-idle: 10
+          # Redis 连接池最小空闲连接数
+          min-idle: 5
+          # 连接池耗尽时，获取连接最多等待 3000 毫秒
+          max-wait: 3000
+
+# MyBatis-Plus 配置
+mybatis-plus:
+  configuration:
+    # 开启数据库下划线命名与 Java 驼峰命名之间的自动映射
+    map-underscore-to-camel-case: true
+    # 开发环境将执行的 SQL 输出到控制台
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+# CampusHub 自定义配置
+campushub:
+  # JWT 配置
+  jwt:
+    # JWT 签名密钥；网关必须使用相同密钥验证 Token
+    secret: ${JWT_SECRET:CampusHub-JWT-Secret-Key-2024-For-Development-Only}
+    # Access Token 有效期，单位为毫秒；7200000 = 2 小时
+    access-token-expiration: 7200000
+    # Refresh Token 有效期，单位为毫秒；604800000 = 7 天
+    refresh-token-expiration: 604800000
+
+# SpringDoc OpenAPI 配置
+springdoc:
+  api-docs:
+    # OpenAPI JSON 文档访问路径；网关通过该路径聚合认证服务文档
+    path: /api/auth/v3/api-docs
+
+# Spring Boot 日志配置
+logging:
+  level:
+    # CampusHub 自己编写的代码使用 DEBUG 日志级别
+    com.campushub: debug

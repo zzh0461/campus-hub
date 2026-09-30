@@ -1,0 +1,50 @@
+# ============================================================
+# CampusHub 管理服务 campus-admin-service
+# admin 是"聚合门面"(BFF)：自己不连任何数据库，
+# 全靠 OpenFeign 调用 user/content/market/activity 各服务的 internal 管理接口。
+# 所以这里没有 datasource / MyBatis-Plus 配置，只有服务发现 + Feign 相关引导配置。
+# ============================================================
+
+server:
+  # 管理服务端口（网关 8080、认证 8081、内容 8082、用户 8083、市场 8084、通知 8085、活动 8086，这里补位用 8087）
+  port: 8087
+
+spring:
+  application:
+    # 服务名，必须和网关路由里的 lb://campus-admin-service 一致
+    name: campus-admin-service
+
+  # 从 Nacos 配置中心导入业务配置（optional：没有这份配置也允许启动，方便本地调试）
+  config:
+    import: optional:nacos:campus-admin-service.yaml?group=DEFAULT_GROUP&refreshEnabled=true
+
+  cloud:
+    nacos:
+      # 配置中心连接信息（必须留在本地，不能依赖 Nacos 自己提供）
+      config:
+        server-addr: ${NACOS_ADDR:0.0.0.0:8848}
+        username: ${NACOS_USERNAME:nacos}
+        password: ${NACOS_PASSWORD:nacos}
+        file-extension: yaml
+      # 服务发现连接信息
+      server-addr: ${NACOS_ADDR:0.0.0.0:8848}
+      username: ${NACOS_USERNAME:nacos}
+      password: ${NACOS_PASSWORD:nacos}
+      discovery:
+        server-addr: ${NACOS_ADDR:0.0.0.0:8848}
+        # 注册到 Nacos 的 IP：本地开发可留空由框架自动探测；
+        # 多网卡环境建议显式指定可回连地址，换网络时用环境变量 NACOS_REGISTER_IP 覆盖
+        ip: ${NACOS_REGISTER_IP:0.0.0.0}
+        group: DEFAULT_GROUP
+
+    # 开启 Feign 断路器：只有打开这个开关，@FeignClient 的 fallback 降级才会生效
+    openfeign:
+      circuitbreaker:
+        enabled: true
+
+# Resilience4j 超时配置：断路器默认超时仅 1 秒，太短容易误判失败触发降级，放宽到 5 秒
+resilience4j:
+  timelimiter:
+    configs:
+      default:
+        timeout-duration: 5s

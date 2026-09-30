@@ -1,0 +1,490 @@
+// ============================================================
+// 登录 / 注册 共享版式
+// 两页结构完全一致(左品牌插画 + 右表单面板),样式只此一份,
+// 差异项通过 .auth-card 上的 CSS 变量注入,避免两份 SCSS 各自漂移。
+// ============================================================
+@use '@/styles/variables.scss' as *;
+
+.auth-page {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  background:
+    radial-gradient(760px 520px at 8% -4%, rgba(14, 122, 92, 0.1), transparent 60%),
+    radial-gradient(620px 460px at 106% 106%, rgba(14, 122, 92, 0.07), transparent 58%),
+    $color-bg;
+}
+
+// 双层嵌套外壳
+.auth-shell {
+  width: min(1100px, 100%);
+  padding: 12px;
+  border-radius: 30px;
+  background: rgba(28, 25, 23, 0.03);
+  border: 1px solid rgba(28, 25, 23, 0.06);
+  box-shadow: 0 40px 90px -40px rgba(9, 84, 65, 0.28);
+}
+
+.auth-card {
+  // —— 可由各页面覆写的差异项 ——
+  --auth-columns: minmax(0, 1.02fr) minmax(420px, 0.98fr);
+  --auth-brand-min-h: 660px;
+  --auth-panel-pad: 44px 44px 40px;
+
+  display: grid;
+  grid-template-columns: var(--auth-columns);
+  border-radius: 20px;
+  overflow: hidden;
+  background: $color-surface;
+
+  // ---------- 左:校园插画 + 翡翠渐变蒙层 ----------
+  &__brand {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    min-height: var(--auth-brand-min-h);
+    color: #fff;
+    background: #0b654c;
+  }
+
+  // 校园插画整幅铺满(与效果图一致):
+  // 素材是竖版 1344×1792(比例 0.75),与竖版品牌栏几乎同比例 ——
+  // 登录栏保留 100% 宽 / 90% 高,注册栏保留 98% 宽 / 100% 高,基本等于整图呈现。
+  &__bg {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  // 蒙层分两层叠:
+  // 1) 自下而上的暗部 —— 只压住最底部,给画面收边、别让草地亮到发飘
+  // 2) 从左向右的深翡翠渐隐 —— 文字压在蒙层上,插画主体在右侧透出
+  &__scrim {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      linear-gradient(
+        to top,
+        rgba(6, 58, 45, 0.88) 0%,
+        rgba(7, 66, 51, 0.52) 11%,
+        rgba(8, 72, 56, 0.16) 28%,
+        rgba(8, 72, 56, 0) 48%
+      ),
+      linear-gradient(
+        100deg,
+        rgba(9, 84, 65, 0.94) 0%,
+        rgba(13, 104, 80, 0.82) 34%,
+        rgba(14, 122, 92, 0.42) 58%,
+        rgba(14, 122, 92, 0.06) 82%
+      );
+  }
+
+  &__brand-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 40px 40px 36px;
+  }
+
+  &__lockup {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    margin-bottom: 52px;
+  }
+
+  &__logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 13px;
+    background: rgba(255, 255, 255, 0.94);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  }
+
+  &__name {
+    font-family: $font-family-display;
+    font-size: 19px;
+    font-weight: 650;
+    letter-spacing: -0.01em;
+  }
+
+  &__headline {
+    margin: 0;
+    font-size: 42px;
+    line-height: 1.18;
+    font-weight: 750;
+    letter-spacing: -0.02em;
+    color: #fff;
+  }
+
+  &__sub {
+    margin: 18px 0 0;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.92);
+  }
+
+  &__sub-sub {
+    margin: 7px 0 0;
+    font-size: 13px;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.72);
+  }
+
+  &__features {
+    // 不吸底:图里烘焙的「在校园 遇见更好的自己」就在面板左下角,
+    // 清单吸底会正好压在标语上(白字压白字)。改为紧跟副标题,把下半幅留给插画本体。
+    margin: 34px 0 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    li {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+  }
+
+  &__feature-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    border-radius: 11px;
+    color: #eafff6;
+    background: rgba(255, 255, 255, 0.14);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  }
+
+  &__feature-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    strong {
+      font-size: 14px;
+      font-weight: 650;
+    }
+
+    small {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.72);
+    }
+  }
+
+  // ---------- 右:表单区 ----------
+  &__panel {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: var(--auth-panel-pad);
+    background: $color-surface;
+  }
+
+  // 右下角建筑插画:完整显示、贴住面板底边,底部柔化融入面板,不留"被切一半"的观感
+  &__watermark {
+    position: absolute;
+    right: clamp(18px, 4.5%, 32px);
+    bottom: 0;
+    z-index: -1;
+    width: clamp(180px, 52%, 300px);
+    height: auto;
+    opacity: 0.55;
+    pointer-events: none;
+    user-select: none;
+    -webkit-mask-image: linear-gradient(to top, transparent 0%, #000 15%);
+    mask-image: linear-gradient(to top, transparent 0%, #000 15%);
+  }
+
+  &__panel-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  &__form-title {
+    margin: 0;
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: $color-text;
+  }
+
+  &__switch {
+    margin: 0;
+    font-size: 12.5px;
+    color: $color-text-secondary;
+    white-space: nowrap;
+  }
+
+  &__form-subtitle {
+    margin: 7px 0 20px;
+    font-size: 13px;
+    color: $color-text-secondary;
+  }
+
+  &__field-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 13px;
+    color: $color-text-secondary;
+  }
+
+  &__field-help {
+    margin: 4px 0 14px;
+    font-size: 12px;
+    color: $color-text-tertiary;
+  }
+
+  &__field-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 16px;
+  }
+
+  &__input-hint {
+    font-size: 12px;
+    color: $color-text-tertiary;
+  }
+
+  // 测试账号体验区(仅登录页使用)
+  &__demo {
+    margin-bottom: 20px;
+    padding: 12px 14px;
+    border: 1px dashed $color-border-strong;
+    border-radius: $radius-sm;
+    background: $color-surface-soft;
+
+    &-label {
+      margin: 0 0 8px;
+      font-size: 12px;
+      color: $color-text-tertiary;
+    }
+
+    &-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    &-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 11px;
+      border: 1px solid $color-border;
+      border-radius: 999px;
+      background: $color-surface;
+      font-size: 12px;
+      color: $color-text-secondary;
+      cursor: pointer;
+      transition: $transition-fast;
+
+      &:hover {
+        color: $color-accent;
+        border-color: rgba(14, 122, 92, 0.45);
+        background: $color-accent-soft;
+      }
+    }
+  }
+
+  &__form-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 2px 0 18px;
+
+    .n-checkbox {
+      font-size: 13px;
+    }
+  }
+
+  &__text-btn {
+    border: none;
+    background: none;
+    padding: 0;
+    font-size: 13px;
+    color: $color-text-secondary;
+    cursor: pointer;
+    transition: $transition-fast;
+
+    &:hover {
+      color: $color-accent;
+    }
+  }
+
+  &__divider {
+    position: relative;
+    margin: 22px 0 16px;
+    text-align: center;
+    font-size: 12px;
+    color: $color-text-tertiary;
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 50%;
+      border-top: 1px solid $color-border;
+    }
+
+    span {
+      position: relative;
+      padding: 0 12px;
+      background: $color-surface;
+    }
+  }
+
+  &__social {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+  }
+
+  &__social-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 999px;
+    border: 1px solid $color-border;
+    background: $color-surface;
+    cursor: pointer;
+    transition: $transition-fast;
+
+    &--wechat {
+      color: #22b358;
+
+      &:hover {
+        border-color: rgba(34, 179, 88, 0.4);
+        background: rgba(34, 179, 88, 0.08);
+      }
+    }
+
+    &--qq {
+      color: #3d8fd1;
+
+      &:hover {
+        border-color: rgba(61, 143, 209, 0.4);
+        background: rgba(61, 143, 209, 0.08);
+      }
+    }
+  }
+
+  &__link {
+    color: $color-accent;
+    font-weight: 600;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  &__agreement {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 2px 0 16px;
+    font-size: 12.5px;
+    color: $color-text-secondary;
+
+    .n-checkbox {
+      align-items: center;
+    }
+  }
+
+  &__agreement-link {
+    border: none;
+    background: none;
+    padding: 0;
+    font-size: 12.5px;
+    color: $color-accent;
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  // ---------- 响应式 ----------
+  @media (max-width: 960px) {
+    grid-template-columns: 1fr;
+
+    &__brand {
+      // 竖版素材放进扁横幅最多只能露出三成高度,给个最小高度免得挤成一条细缝
+      min-height: 300px;
+      padding: 0;
+    }
+
+    &__brand-content {
+      padding: 28px 26px;
+    }
+
+    &__headline {
+      font-size: 30px;
+    }
+
+    &__sub-sub,
+    &__features {
+      display: none;
+    }
+
+    // 窄屏变成低矮横幅,纵向只留约三成,取景点下移到教学楼与广场一带
+    &__bg {
+      object-position: center 45%;
+    }
+
+    &__panel {
+      padding: 30px 26px 36px;
+    }
+
+    &__watermark {
+      display: none;
+    }
+
+    &__field-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+}
+
+// 入场动画尊重系统「减弱动态效果」设置
+@media (prefers-reduced-motion: no-preference) {
+  .auth-shell {
+    animation: auth-reveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+}
+
+@keyframes auth-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

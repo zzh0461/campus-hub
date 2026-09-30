@@ -1,0 +1,71 @@
+// ============================================================
+// CampusHub 设计变量 —— 校园二手市场风格
+// 白 + 浅灰 + 校园绿 · 大面积留白 · 圆角卡片 · 轻阴影 · 细边框
+// ============================================================
+
+// 字体:自托管 Outfit 变量字体打头(拉丁字形/数字),中文回落到现代无衬线系统栈
+$font-family:
+  'Outfit Variable',
+  'MiSans',
+  'HarmonyOS Sans SC',
+  'PingFang SC',
+  'Microsoft YaHei',
+  'Segoe UI',
+  sans-serif;
+// 展示用(品牌字标/眉标/大数字)
+$font-family-display:
+  'Outfit Variable',
+  'MiSans',
+  'HarmonyOS Sans SC',
+  'PingFang SC',
+  sans-serif;
+$font-family-mono:
+  'JetBrains Mono',
+  'Cascadia Code',
+  'SFMono-Regular',
+  Consolas,
+  monospace;
+
+// 中性色(冷调浅灰基底,白卡片,细边框)
+$color-bg: #f6f7f9;
+$color-surface: #ffffff;
+$color-surface-soft: #f2f4f6;
+$color-border: #e8eaee;
+$color-border-strong: #d8dce2;
+$color-text: #1f2329;
+$color-text-secondary: #6b7280;
+$color-text-tertiary: #9aa1ab;
+
+// 单一强调色:校园绿(鲜亮、年轻)
+$color-accent: #16a34a;
+$color-accent-hover: #15803d;
+$color-accent-pressed: #166534;
+$color-accent-soft: rgba(22, 163, 74, 0.1);
+
+// 价格红(电商惯用)与语义色
+$color-price: #f0413e;
+$color-danger: #e0413c;
+$color-danger-soft: rgba(224, 65, 60, 0.09);
+$color-warning: #d97706;
+$color-warning-soft: rgba(217, 119, 6, 0.1);
+$color-info: #2563a8;
+$color-info-soft: rgba(37, 99, 168, 0.09);
+
+// 圆角与阴影(大圆角卡片,轻阴影带一点绿调)
+$radius-xs: 8px;
+$radius-sm: 10px;
+$radius-md: 14px;
+$radius-lg: 20px;
+$shadow-soft: 0 8px 28px -12px rgba(31, 35, 41, 0.12);
+$shadow-hover: 0 18px 40px -16px rgba(22, 101, 52, 0.2);
+
+// 动效
+$transition-fast: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+$transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+
+// 布局
+// 1200 → 1320 → 1440:大屏下两侧空白过多,主内容区逐步放宽。
+// 1440 是上限;但窄桌面(1366/1440 宽)下不能直接顶到屏幕边,
+// 所以 .container 用的是 min(上限, 100% - 80px) —— 见 global.scss。
+$container-max: 1440px;
+$header-height: 64px;

@@ -1,0 +1,195 @@
+@use './variables.scss' as *;
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: $font-family;
+  font-size: 14px;
+  line-height: 1.6;
+  color: $color-text;
+  background: $color-bg;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+#app {
+  min-height: 100dvh;
+}
+
+// 容器
+.container {
+  width: 100%;
+  // 宽度上限 $container-max;同时始终留出 24px×2 的屏幕边距 ——
+  // 超宽屏不至于太空旷,1366/1440 这类窄桌面又不至于贴着屏幕边。
+  max-width: min(#{$container-max}, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0 16px;
+  }
+}
+
+// 面板:仅在有层级需要时使用,避免卡片滥用
+.panel {
+  background: $color-surface;
+  border: 1px solid $color-border;
+  border-radius: $radius-md;
+  box-shadow: $shadow-soft;
+}
+
+// 数字
+.num {
+  font-family: $font-family-mono;
+  font-variant-numeric: tabular-nums;
+}
+
+// 文本工具类
+.text-secondary {
+  color: $color-text-secondary;
+}
+
+.text-tertiary {
+  color: $color-text-tertiary;
+}
+
+.text-accent {
+  color: $color-accent;
+}
+
+.text-danger {
+  color: $color-danger;
+}
+
+// 悬浮抬升
+.lift {
+  transition: $transition;
+}
+
+.lift:hover {
+  transform: translateY(-3px);
+  box-shadow: $shadow-hover;
+}
+
+// 交互反馈
+.pressable {
+  transition: $transition-fast;
+}
+
+.pressable:active {
+  transform: scale(0.98);
+}
+
+// 入场动画:瀑布式加载
+@keyframes fade-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.rise-in {
+  animation: fade-rise 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+// 骨架屏微光
+@keyframes shimmer {
+  0% {
+    background-position: -400px 0;
+  }
+  100% {
+    background-position: 400px 0;
+  }
+}
+
+.skeleton-block {
+  background: linear-gradient(
+    90deg,
+    $color-surface-soft 0%,
+    #e9edf1 50%,
+    $color-surface-soft 100%
+  );
+  background-size: 800px 100%;
+  animation: shimmer 1.6s infinite linear;
+  border-radius: $radius-xs;
+}
+
+// 页面切换过渡
+.page-fade-enter-active,
+.page-fade-leave-active {
+  transition:
+    opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.page-fade-enter-from {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.page-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
+}
+
+// 列表交错
+.stagger-item {
+  animation: fade-rise 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(var(--i, 0) * 60ms);
+}
+
+// 细网格背景(首页 Hero 科技感)
+.grid-bg {
+  background-image:
+    linear-gradient(to right, rgba(31, 35, 41, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(31, 35, 41, 0.05) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(ellipse 80% 70% at 70% 30%, #000 30%, transparent 75%);
+}
+
+// 滚动条
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: $color-border-strong;
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+// Markdown / 富文本正文
+.rich-text {
+  white-space: pre-wrap;
+  line-height: 1.9;
+  color: $color-text;
+}

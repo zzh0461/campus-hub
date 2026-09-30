@@ -1,0 +1,123 @@
+# Nacos Data ID: campus-gateway.yaml
+# Group: DEFAULT_GROUP
+
+spring:
+  # Spring Cloud 配置
+  cloud:
+    # Spring Cloud Gateway 配置
+    gateway:
+      # 网关路由列表
+      routes:
+        # 认证服务路由
+        - id: auth-service
+          # 使用 Nacos 服务发现，通过服务名找到认证服务实例
+          uri: lb://campus-auth-service
+          # 请求路径匹配 /api/auth/** 时转发到认证服务
+          predicates:
+            - Path=/api/auth/**
+        # 用户服务路由
+        - id: user-service
+          # 使用负载均衡方式访问用户服务
+          uri: lb://campus-user-service
+          # 请求路径匹配 /api/users/** 时转发到用户服务
+          predicates:
+            - Path=/api/users/**
+        # 内容服务路由，负责公告和失物招领
+        - id: content-service
+          # 使用负载均衡方式访问内容服务
+          uri: lb://campus-content-service
+          # 两类请求路径都转发到内容服务
+          predicates:
+            - Path=/api/announcements/**,/api/lost-found/**
+        # 二手市场服务路由
+        - id: market-service
+          # 使用负载均衡方式访问市场服务
+          uri: lb://campus-market-service
+          # 请求路径匹配 /api/market/** 时转发到市场服务
+          predicates:
+            - Path=/api/market/**
+        # 活动服务路由
+        - id: activity-service
+          # 使用负载均衡方式访问活动服务
+          uri: lb://campus-activity-service
+          # 请求路径匹配 /api/activities/** 时转发到活动服务
+          predicates:
+            - Path=/api/activities/**
+        # 通知服务路由
+        - id: notification-service
+          # 使用负载均衡方式访问通知服务
+          uri: lb://campus-notification-service
+          # 请求路径匹配 /api/notifications/** 时转发到通知服务
+          predicates:
+            - Path=/api/notifications/**
+        # 管理后台服务路由
+        - id: admin-service
+          # 使用负载均衡方式访问管理服务
+          uri: lb://campus-admin-service
+          # 请求路径匹配 /api/admin/** 时转发到管理服务
+          predicates:
+            - Path=/api/admin/**
+      # Gateway 默认过滤器配置
+      default-filters:
+        # 去除重复的 CORS 响应头，只保留唯一值
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
+  # Spring Data Redis 配置
+  data:
+    # 网关使用 Redis 保存/校验 Token 黑名单
+    redis:
+      # Redis 服务器地址；未设置 REDIS_HOST 时使用 0.0.0.0
+      host: ${REDIS_HOST:0.0.0.0}
+      # Redis 服务端口
+      port: ${REDIS_PORT:6379}
+      # Redis 登录密码；未设置 REDIS_PASSWORD 时使用 123456
+      password: ${REDIS_PASSWORD:123456}
+      # Redis 使用的逻辑数据库编号
+      database: 0
+      # Redis 命令超时时间，单位为毫秒
+      timeout: 10000
+
+# CampusHub 网关自定义配置
+campushub:
+  # Gateway 鉴权配置
+  gateway:
+    # JWT 签名密钥；必须与认证服务使用的 JWT secret 完全一致
+    jwt-secret: ${JWT_SECRET:CampusHub-JWT-Secret-Key-2024-For-Development-Only}
+    # 不需要经过 JWT 鉴权的请求路径
+    white-list:
+      # 登录接口
+      - /api/auth/login
+      # 注册接口
+      - /api/auth/register
+      # 刷新 Access Token 接口
+      - /api/auth/refresh
+      # 认证服务 OpenAPI 文档接口
+      - /api/auth/v3/api-docs
+      # 健康检查接口
+      - /health
+      # API 健康检查接口
+      - /api/health
+      # OpenAPI 文档接口
+      - /v3/api-docs/**
+      # Swagger UI 入口
+      - /swagger-ui.html
+      # Swagger UI 静态资源
+      - /swagger-ui/**
+      # Swagger WebJars 静态资源
+      - /webjars/**
+
+# SpringDoc OpenAPI 配置
+springdoc:
+  # Swagger UI 配置
+  swagger-ui:
+    # Swagger UI 聚合的下游服务文档列表
+    urls:
+      # 认证服务文档名称
+      - name: 认证服务
+        # 通过网关访问认证服务的 OpenAPI 文档
+        url: /api/auth/v3/api-docs
+
+# Spring Boot 日志配置
+logging:
+  level:
+    # 网关自身代码使用 INFO 日志级别
+    com.campushub: info

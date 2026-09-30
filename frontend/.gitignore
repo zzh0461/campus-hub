@@ -1,0 +1,33 @@
+# dependencies
+node_modules/
+
+# production
+dist/
+
+# local env files
+.env.local
+.env.*.local
+
+# logs
+*.log
+
+# editor
+.idea/
+.vscode/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# =========================
+# 本地上传文件（market 图片上传落盘目录，不入库）
+# =========================
+uploads/
+**/uploads/
+
+# =========================
+# Spring Boot 临时文件
+# =========================
+
+spring.log
