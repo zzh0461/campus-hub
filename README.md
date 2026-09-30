@@ -1,4 +1,5 @@
 # CampusHub 校园综合服务平台
+![首页预览](https://github.com/user-attachments/assets/44399c98-1e8f-4303-bd63-8fdaa0d90e6e)
 
 <p align="center">
   <b>基于 Spring Cloud Alibaba 微服务 + Vue 3 的校园综合服务平台</b>
